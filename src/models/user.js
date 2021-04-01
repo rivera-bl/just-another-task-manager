@@ -56,6 +56,8 @@ const userSchema = new mongoose.Schema({
             required: true
         }
     }]
+},{
+    timestamps: true
 })
 
 // we are not changing what we store for the Users documents, its virtual, it marks a relationship. 'userTasks' is just a name for our virtual. foreignField is the field in the Other Object (Task) that marks the relationship, and the localField is the field of This Object (User) thats being saved on the foreignField of the Other Object
