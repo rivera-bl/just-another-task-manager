@@ -21,12 +21,20 @@ router.post('/tasks', auth, async (req, res) => {
 
 
 // READ ALL THE TASKS OF THE USER LOGGED IN
+// can be filtered by completed status too
 router.get('/tasks', auth, async (req, res) => {
+    const match = {}
+    
+    // if query.completed = true it will set match to true, else it will set to false. but if it's an empty string it wont pass the if and just return all
+    if(req.query.completed) {
+        match.completed = req.query.completed === 'true'
+    }
+
     try{
-        // either approach will work
-        // const tasks = await Task.find({ owner: req.user._id })
-        // res.send(tasks)
-        await req.user.populate('userTasks').execPopulate()
+        await req.user.populate({
+            path: 'userTasks', 
+            match
+        }).execPopulate()
         res.send(req.user.userTasks)
     }catch (e){
         res.status(500).send()
