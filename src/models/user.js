@@ -70,13 +70,14 @@ userSchema.virtual('userTasks', {
     foreignField: 'owner'
 })
 
-// with the method toJSON we can send back just the properties that we want
+// .toJSON specifies which properties of the object to send to the client
 userSchema.methods.toJSON = function () {
     const user = this
     const userObject = user.toObject()
     
     delete userObject.password 
     delete userObject.tokens 
+    delete userObject.avatar 
 
     return userObject
 }

@@ -1,5 +1,6 @@
 const express = require('express')
 const multer = require('multer')
+const sharp = require('sharp')
 const User = require('../models/user.js')
 const auth = require('../middleware/auth.js')
 const router = new express.Router()
@@ -117,8 +118,10 @@ const upload = multer({
 
 // .single() takes the key to use for the request
 router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
-    // can only access file.buffer if the dest option is not set
-    req.user.avatar = req.file.buffer
+    // can only access file.buffer if the multer dest option is not set
+    const buffer = await sharp(req.file.buffer).resize({ width: 250, height:250 }).png().toBuffer()
+    req.user.avatar = buffer
+
     await req.user.save()
     res.send()
 // Custom error handling so we get JSON instead of the html from multer
@@ -147,7 +150,7 @@ router.get('/users/:id/avatar', async (req, res) => {
         }
 
         // setting the headers for the response
-        res.set('Content-Type', 'image/jpg')
+        res.set('Content-Type', 'image/png')
         res.send(user.avatar)
     }catch (e){
     }
