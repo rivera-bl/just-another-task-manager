@@ -108,7 +108,7 @@ const upload = multer({
     },
     fileFilter(req, file, cb) {
         if(!file.originalname.match(/\.(jpg|png|jpeg)$/)) {
-            return cb(new Error('Please upload a JPG/PNG Image'))
+            return cb(new Error('Please upload a JPG/JPEG/PNG Image'))
         }
 
         // cb function that allows the upload
@@ -119,6 +119,8 @@ const upload = multer({
 // .single() takes the key to use for the request
 router.post('/users/me/avatar', upload.single('avatar'), (req, res) => {
     res.send()
+}, (error, req, res, next) => {
+    res.status(400).send({ error: error.message })
 })
 
 module.exports = router
