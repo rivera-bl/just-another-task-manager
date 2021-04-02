@@ -102,7 +102,18 @@ router.delete('/users/me', auth, async (req, res) => {
 
 // ADD AN AVATAR IMAGE 
 const upload = multer({
-    dest: 'avatars' // dir for saving the uploaded files, will create itself
+    dest: 'avatars', // dir for saving the uploaded files, will create itself
+    limits: {
+        fileSize: 1000000 // 1MB
+    },
+    fileFilter(req, file, cb) {
+        if(!file.originalname.match(/\.(jpg|png|jpeg)$/)) {
+            return cb(new Error('Please upload a JPG/PNG Image'))
+        }
+
+        // cb function that allows the upload
+        cb(undefined, true)
+    }
 })
 
 // .single() takes the key to use for the request
