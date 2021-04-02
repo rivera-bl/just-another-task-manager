@@ -100,7 +100,7 @@ userSchema.statics.findByCredentials = async (email, password) => {
         throw new Error('Unable to Login')
     }
 
-    //firs the plaintext password, then the hashed password
+    // takes the plaintext password and the hashed password
     const isMatch = await bcrypt.compare(password, user.password)
 
     if(!isMatch){

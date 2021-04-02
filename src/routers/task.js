@@ -21,7 +21,7 @@ router.post('/tasks', auth, async (req, res) => {
 
 
 // READ ALL THE TASKS OF THE USER LOGGED IN
-// can be filtered by completed status too
+// can be filtered by completed status & limit the number of results
 router.get('/tasks', auth, async (req, res) => {
     const match = {}
     
@@ -33,7 +33,11 @@ router.get('/tasks', auth, async (req, res) => {
     try{
         await req.user.populate({
             path: 'userTasks', 
-            match
+            match,
+            options: {
+                limit: parseInt(req.query.limit),
+                skip: parseInt(req.query.skip)
+            }
         }).execPopulate()
         res.send(req.user.userTasks)
     }catch (e){
