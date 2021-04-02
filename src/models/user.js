@@ -86,7 +86,7 @@ userSchema.methods.toJSON = function () {
 userSchema.methods.generateAuthToken = async function () {
     const user = this
     // with sign we provide a payload(that uniquely identifies the user we want to authenticate, and a secret
-    const token = jwt.sign({_id: user._id.toString()}, 'thisismynewcourse')
+    const token = jwt.sign({_id: user._id.toString()}, process.env.JWT_SECRET)
     // everytime we generate a toker we concatenate it to the token array in the User object
     user.tokens = user.tokens.concat({ token })
     

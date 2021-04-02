@@ -6,7 +6,7 @@ const auth = async (req, res, next) => {
         // save the token passed into the header
         const token = req.header('Authorization').replace('Bearer ', '')
         // verify the token with the secret passed in the creation
-        const decoded = jwt.verify(token, 'thisismynewcourse')
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
         // find an user with the same id of the token and the token
         const user = await User.findOne({ _id: decoded._id, 'tokens.token': token })
 
