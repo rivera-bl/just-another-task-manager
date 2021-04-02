@@ -21,13 +21,20 @@ router.post('/tasks', auth, async (req, res) => {
 
 
 // READ ALL THE TASKS OF THE USER LOGGED IN
-// can be filtered by completed status & limit the number of results
+// can be filtered by completed status, limit the number of results, & sort
 router.get('/tasks', auth, async (req, res) => {
     const match = {}
+    const sort = {}
     
     // if query.completed = true it will set match to true, else it will set to false. but if it's an empty string it wont pass the if and just return all
     if(req.query.completed) {
         match.completed = req.query.completed === 'true'
+    }
+
+    if(req.query.sortBy){
+        const parts = req.query.sortBy.split(':')
+        // ternary operator
+        sort[parts[0]] = parts[1] === 'desc' ? -1 : 1
     }
 
     try{
@@ -36,7 +43,8 @@ router.get('/tasks', auth, async (req, res) => {
             match,
             options: {
                 limit: parseInt(req.query.limit),
-                skip: parseInt(req.query.skip)
+                skip: parseInt(req.query.skip),
+                sort
             }
         }).execPopulate()
         res.send(req.user.userTasks)
