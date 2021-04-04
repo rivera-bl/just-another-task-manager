@@ -73,7 +73,7 @@ test('Should not get profile for unauthenticated user', async () => {
 
 // DELETE ACCOUNT
 test('Should delete account for authenticated user', async () => {
-     const res = await request(app)
+    await request(app)
         .delete('/users/me')
         .set('Authorization', `Bearer ${userLog.tokens[0].token}`)
         .send()
@@ -88,4 +88,44 @@ test('Should not delete account for unauthenticated user', async () => {
         .delete('/users/me')
         .send()
         .expect(401)
+})
+
+// AVATAR UPLOAD
+test('Should upload avatar image', async () => {
+    await request(app)
+        .post('/users/me/avatar')
+        .set('Authorization', `Bearer ${userLog.tokens[0].token}`)
+        .attach('avatar', 'tests/fixtures/profile-picture.jpg')
+        .expect(200)
+
+    const user = await User.findById(userLogId)
+    // .toBe() uses the === operator so we can't use it to compare objects
+    // .toEqual(), on the otherhand, compares the properties of the object
+    // we don't have the value of the avatar sent, we just compare its type
+    expect(user.avatar).toEqual(expect.any(Buffer))
+})
+
+// UPDATE USER LOGGED IN
+test('Should update valid user fields', async () => {
+    await request(app)
+        .patch('/users/me')
+        .set('Authorization', `Bearer ${userLog.tokens[0].token}`)
+        .send({
+            name: 'Test Updated',
+            age: 20
+        })
+        .expect(200)
+
+    const user = await User.findById(userLogId)
+    expect(user.name).toEqual('Test Updated')
+})
+
+test('Should not update invalid user fields', async () => {
+    await request(app)
+        .patch('/users/me')
+        .set('Authorization', `Bearer ${userLog.tokens[0].token}`)
+        .send({
+            location: 'santiago'
+        })
+        .expect(400)
 })
