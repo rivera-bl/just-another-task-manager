@@ -1,31 +1,12 @@
 // convention name for supertest
 const request = require('supertest')
-const jwt = require('jsonwebtoken')
-const mongoose = require('mongoose')
 const app = require('../src/app.js')
 const User = require('../src/models/user.js')
-
-// creates an id for the user
-const userLogId = new mongoose.Types.ObjectId()
-
-const userLog = {
-    _id: userLogId,
-    name: 'Test Login',
-    email: 'testlogin@example.com',
-    password: 'pass12345',
-    tokens: [{
-        token: jwt.sign({ _id: userLogId }, process.env.JWT_SECRET)
-    }]
-}
+const { userLog, userLogId, setupDatabase } = require('./fixtures/db.js')
 
 // jest setup & teardown for lifecycle functions
 // beforeEach will run before each test case
-beforeEach(async () => {
-    // deletes every user of the database
-    await User.deleteMany()
-    // creates a test user for cases that require an user logged in
-    await new User(userLog).save()
-})
+beforeEach(setupDatabase)
 
 // POST CREATE USER
 test('Should signup a new user', async () => {
