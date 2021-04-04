@@ -23,7 +23,7 @@ const userLog = {
 beforeEach(async () => {
     // deletes every user of the database
     await User.deleteMany()
-    // creates a test user for cases that required an user logged in
+    // creates a test user for cases that require an user logged in
     await new User(userLog).save()
 })
 
@@ -38,10 +38,14 @@ test('Should signup a new user', async () => {
 
 // POST LOGIN USER
 test('Should login existing user', async () => {
-    await request(app).post('/users/login').send({
+    const res = await request(app).post('/users/login').send({
         email: userLog.email,
         password: userLog.password
     }).expect(200)
+    
+    // when login an user the res gives a token for the session, but it's the second token of the user because when the user is created it gets a token too
+    const user = await User.findById(userLogId)
+    expect(res.body.token).toBe(user.tokens[1].token)
 })
 
 test('Shouldn\'t login bad password', async () => {
@@ -69,11 +73,14 @@ test('Should not get profile for unauthenticated user', async () => {
 
 // DELETE ACCOUNT
 test('Should delete account for authenticated user', async () => {
-    await request(app)
+     const res = await request(app)
         .delete('/users/me')
         .set('Authorization', `Bearer ${userLog.tokens[0].token}`)
         .send()
         .expect(200)
+
+    const user = await User.findById(userLogId)
+    expect(user).toBeNull()
 })
 
 test('Should not delete account for unauthenticated user', async () => {
